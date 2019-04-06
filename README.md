@@ -1,0 +1,2 @@
+# Statistical_Inference_Course_Project
+Coursera Statistical Inference Course Project
