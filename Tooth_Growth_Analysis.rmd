@@ -1,0 +1,67 @@
+---
+title: "Tooth Growth Analysis"
+author: "Dustin Lanning"
+date: "April 6, 2019"
+output: 
+  html_document: 
+    fig_caption: yes
+    keep_md: yes
+---
+
+##Overview
+
+The purpose of this project is to analyze the ToothGrowth dataset. ToothGrowth data set contains the result from an experiment studying the effect of vitamin C on tooth growth in 60 Guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one of two delivery methods, (orange juice or ascorbic acid (a form of vitamin C and coded as VC).
+
+##Exploratory Data Analysis
+
+We will begin the analysis by loading the dataset and performing some exploratory analysis.
+
+```{r}
+library(datasets)
+data("ToothGrowth")
+str(ToothGrowth)
+head(ToothGrowth)
+summary(ToothGrowth)
+```
+
+View the data graphically to begin drawing conclusions about the relationships between the data.
+
+```{r}
+library(ggplot2)
+ggplot(data = ToothGrowth, aes(supp, len)) + geom_boxplot(aes(fill = supp), show.legend = FALSE) + labs(title = "Tooth Growth by Supplement", x = "Supplement", y = "Tooth Length") + theme(plot.title = element_text(hjust = 0.5))
+ggplot(data = ToothGrowth, aes(factor(dose), len)) + geom_boxplot(aes(fill = dose), show.legend = FALSE) + labs(title = "Tooth Growth by Dosage", x = "Dosage (mg/day)", y = "Tooth Length") + theme(plot.title = element_text(hjust = 0.5))
+ggplot(data = ToothGrowth, aes(factor(dose), len)) + facet_grid(.~supp) + geom_boxplot(aes(fill = supp), show.legend = FALSE) + labs(title = "Tooth Growth by Supplement and Dosage", x = "Dosage (mg/day", y = "Tooth Length") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+The preliminary analysis seems to show that at higher dosages, 2 milligrams per day, both orange juice and ascorbic acid increase tooth growth. At lower dosages, 0.5 to 1 milligrams per day, orange juice appears to be more effective at promoting tooth growth. The preliminary anaysis seems to suggest that the use of orange juice promotes tooth growth.
+
+##Confidence Intervals and Hypothesis Testing
+
+###Hypothesis 1
+Orange juice and ascorbic acid are equally effective at promoting tooth growth.
+
+```{r}
+t.test(len~supp, data = ToothGrowth)
+```
+
+The p-value of 0.06 is greater than the threshhold of 0.05. Additionally, the 95% confidence interval contains zero. The null hypothesis cannot be rejected.
+
+###Hypothesis 2
+The dosages are equally effective at promoting tooth growth.
+
+```{r}
+t.test(len~dose, data = subset(ToothGrowth, dose == c(0.5, 1)))
+t.test(len~dose, data = subset(ToothGrowth, dose == c(0.5, 2)))
+t.test(len~dose, data = subset(ToothGrowth, dose == c(1, 2)))
+```
+
+The p-values of each test are less than the threshhold of 0.05. Additionally, the 95% confidence intervals for each test do not contain zero. The null hypothesis is rejected.
+
+##Conclusion
+
+Given the following assumptions:
+
+    1. The sample is representative of the population.
+    2. Normal distribution of tooth lengths.
+
+Based on the analysis, we conclude that the type of supplement has no effect on tooth growth. However, increased dosages promote tooth growth using either supplement.
